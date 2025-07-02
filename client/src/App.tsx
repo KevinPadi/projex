@@ -1,35 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/clerk-react'
+import { useEffect } from 'react'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+
+  const { isSignedIn, user } = useUser()
+
+  const handleProtectedClick = async () => {
+    fetch('http://localhost:3000/protected', {
+      method: 'GET',
+      credentials: 'include', // importante para enviar cookies de sesión Clerk
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log('Usuario autenticado:', data.user)
+    })
+    .catch(err => {
+      console.error('Error:', err)
+    })
+  }
+
+  useEffect(() => {
+    if (isSignedIn) console.log(user)
+    else console.log('Usuario NO logueado:', user)
+  }, [isSignedIn, user])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <header>
+      <SignedOut>
+        <SignInButton  />
+      </SignedOut>
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+
+      <button onClick={handleProtectedClick} style={{ backgroundColor: "white", color: "black", border: "1px solid black", padding: "10px 20px", borderRadius: "5px" }}>
+        Protected
+      </button>
+    </header>
   )
 }
-
-export default App
