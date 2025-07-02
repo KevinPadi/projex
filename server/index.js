@@ -1,9 +1,15 @@
 import 'dotenv/config'
 import express from 'express'
 import { clerkClient, requireAuth, getAuth } from '@clerk/express'
+import cors from 'cors'
 
 const app = express()
 const PORT = 3000
+
+app.use(cors({
+  origin: 'http://localhost:5173', // o '*'
+  credentials: true
+}))
 
 // Use requireAuth() to protect this route
 // If user isn't authenticated, requireAuth() will redirect back to the homepage
